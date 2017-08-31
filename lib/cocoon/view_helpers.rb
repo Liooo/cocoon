@@ -77,7 +77,7 @@ module Cocoon
 
         link_to_add_association(name, *args)
       else
-        name, f, association, html_options = *args
+        name, f, association, html_options, custom_create_object = *args
         html_options ||= {}
 
         render_options   = html_options.delete(:render_options)
@@ -92,7 +92,7 @@ module Cocoon
         html_options[:'data-association'] = association.to_s.singularize
         html_options[:'data-associations'] = association.to_s.pluralize
 
-        new_object = create_object(f, association, force_non_association_create)
+        new_object = (custom_create_object && custom_create_object.respond_to?(:call)) ? custom_create_object.call : create_object(f, association, force_non_association_create)
         new_object = wrap_object.call(new_object) if wrap_object.respond_to?(:call)
 
         html_options[:'data-association-insertion-template'] = CGI.escapeHTML(render_association(association, f, new_object, form_parameter_name, render_options, override_partial).to_str).html_safe
